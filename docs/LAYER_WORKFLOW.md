@@ -1,6 +1,19 @@
 # Layer workflow
 
-LUM keeps composition editable: each object has its own position, size, rotation, opacity and optional mask. Clipboard import, stabilized drawing, scoped ChatGPT briefs, raster inspection and prepared-layer import work now. Automatic **Dissect**, semantic selection masks, hidden-area reconstruction and automatic generation are proposed next steps; no paid inference engine is active.
+LUM keeps composition editable: each object has its own position, size, rotation, opacity and optional mask. Clipboard import, stabilized drawing, scoped ChatGPT briefs, raster inspection and prepared-layer import work now. ChatGPT can orchestrate generative preparation through available conversation image tools. An in-editor automatic **Dissect** button, semantic selection masks and an autonomous inference service remain proposed next steps; no paid inference engine is active.
+
+## Chat command
+
+Attach an image in a conversation with LUM connected and say **“Dissect into LUM.”** The MCP server advertises this natural-language workflow; it is not a dedicated slash command or a new image model.
+
+1. Identify the source, meaningful objects, stack order and placement.
+2. Create a new project unless the user chose an existing destination. Save the original as a locked, hidden source layer.
+3. Use the conversation's available native image tools to prepare one transparent object per output, referencing the same original for every output. No additional provider setup is necessary for this generative route.
+4. Check alpha, boundaries, dimensions and composition. Keep supplied exact lettering where possible; identify reconstructed or uncertain details in source notes.
+5. Upload the assets and import their named layers together using the latest project revision.
+6. Read back the saved project and return its link with any remaining quality limitations.
+
+This route is generative isolation/reconstruction. It can alter details and does not guarantee an exact recomposition of the original. If the user asks for exact pixel extraction, use suitable segmentation/masks or state the missing capability instead of silently regenerating the artwork. The workflow depends on the tools available in the conversation and their usage limits. A command alone does not execute image generation, and backend preparation tools must not be reported as completed images.
 
 ## Start with the source
 

@@ -33,6 +33,7 @@ Open the private LUM site, then connect the LUM plugin offered by ChatGPT after 
 
 Useful requests include:
 
+- Attach an image and say **“Dissect into LUM.”** ChatGPT plans objects, prepares separate transparent assets with available image tools, and imports them into a new LUM project. This is a guided generative workflow, not guaranteed original-pixel extraction.
 - “List my LUM projects and inspect Signal study.”
 - “Move the red circle 40 pixels left. Keep the text and locked artwork unchanged.”
 - “Make the selected source image a structure reference at 80% strength.”
@@ -43,6 +44,8 @@ Useful requests include:
 The plugin reads a project's current revision before editing it. Its tools reject conflicting revisions and locked-layer edits. If you see a conflict in the editor, preserve your working copy and reload the current project before retrying.
 
 ### Generation is a separate step
+
+**“Dissect into LUM” happens in the chat.** It does not require an additional hosted engine or API key when the conversation already has native image tools. The assistant performs the preparation and import steps, keeps a locked source, and labels reconstructed or uncertain details. Exact extraction needs suitable masks or segmentation; saying “dissect” cannot recover hidden original pixels. Tool availability and image-generation limits still apply. See [the chat workflow](docs/LAYER_WORKFLOW.md#chat-command) for the sequence.
 
 LUM does **not** call an image model, spend API credits or require an OpenAI API key. **Reimagine in ChatGPT** saves the project and copies a scoped brief for you to paste into the connected conversation; it does not automatically start a ChatGPT turn. `lum_prepare_render` also produces a structured brief, not an image. Image generation, when available in the surrounding ChatGPT session, happens separately. Import the result as a separate candidate layer for review, preserving the original.
 
