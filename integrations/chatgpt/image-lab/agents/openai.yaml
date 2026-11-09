@@ -1,0 +1,4 @@
+interface:
+  display_name: "LUM Image Lab"
+  short_description: "Dissect, enhance, and reimagine artwork in chat"
+  default_prompt: "Use $lum-image-lab to inspect my attached artwork and show the best image actions."

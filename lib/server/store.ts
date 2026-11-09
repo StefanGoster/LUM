@@ -26,10 +26,10 @@ export async function saveProject(id:string,input:unknown,expectedRevision:numbe
   if(result.meta.changes!==1){const latest=await getProject(id);throw new LumError('The project changed while this edit was saving. Reload before retrying.',409,'revision_conflict',latest.revision);}
   return document;
 }
-export async function uploadAsset(bytes:ArrayBuffer,mime:string,name='Artwork'){
+export async function uploadAsset(bytes:ArrayBuffer,mime:string,name='Artwork',contentAddressed=false){
   mime=validateAsset(bytes,mime);
   if(!env.BUCKET)throw new LumError('Asset storage is unavailable.',503,'storage_unavailable');
-  const id=crypto.randomUUID();await env.BUCKET.put(`assets/${id}`,bytes,{httpMetadata:{contentType:mime},customMetadata:{name:name.slice(0,200)}});
+  const id=contentAddressed?'sha256-'+Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join(''):crypto.randomUUID();await env.BUCKET.put(`assets/${id}`,bytes,{httpMetadata:{contentType:mime},customMetadata:{name:name.slice(0,200)}});
   return {id,src:`/api/assets/${id}`};
 }
 export async function getAsset(id:string){

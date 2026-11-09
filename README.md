@@ -6,6 +6,22 @@ This is an editable composition tool. Projects contain separate text, shapes, pa
 
 ![LUM studio with stabilized brush controls](docs/images/studio-brushes.jpg)
 
+## Image Lab v2
+
+Use **LUM Image Lab** in ChatGPT for Dissect, HD / Remaster, Clean Noise and Reimagine. A clear command runs directly; an ambiguous creative artwork upload receives a short observation and action menu. Image generation uses the chat's available native image tool. **Results stay in chat by default.** Choose LUM saving when an editable stored project is useful.
+
+The [Image Lab menu](https://lum-studio.ghoster555.chatgpt.site/image-tools) also works as a standalone brief builder. Inside a compatible ChatGPT MCP Apps host it can send the selected action back to the conversation. Outside that host, copy its instructions into the image chat. It does not itself invoke a model or automatically receive an image from the editor.
+
+- `modules/image-lab/core.ts`: independent action directions, no storage or editor dependency.
+- `modules/image-lab/widget.ts`: focused checkbox menu, with host capability detection and copy fallback.
+- `integrations/chatgpt/image-lab`: reusable chat workflow source, also installed separately as a personal workflow.
+- `modules/image-lab/tools.ts`: optional LUM file-reference bridge and revision-checked metadata checkpoints.
+- `modules/image-lab/transfer.ts`: bounded server-side file download, restricted HTTPS hosts, redirects disabled, 12 MB streamed size cap and timeout. Imports use content hashes to avoid duplicate assets on retry.
+
+`lum_import_chat_file` accepts authorized ChatGPT file references. It never returns image bytes as text. File URLs expire and provider/host support may vary; unsupported transfers stop and preserve chat output, with normal LUM upload as fallback. The old base64 tool is limited to 32 KB encoded input. MCP requests are limited to 256 KB and ordinary results to 128 KB, with no duplicated JSON text result. Explicit image-inspection content remains an image, not encoded text to transcribe.
+
+No global image-upload observer, autonomous image engine, or separate paid API is installed. HD / Remaster is a generative editing direction, not a claim of exact super-resolution or DLSS. Original pixels and exact typography need source assets or appropriate deterministic masking. The workflow checkpoints references, not the image bytes; a saved reference is not proof an image remains downloadable forever.
+
 ## What works
 
 - Select, move, resize and rotate individual objects with Fabric.js controls.
@@ -88,7 +104,7 @@ corepack pnpm run build
 Run the document, brush geometry and layer-bundle checks with:
 
 ```sh
-node --experimental-strip-types --test tests/backend.test.mjs tests/brush.test.mjs tests/layer-bundle.test.mjs
+node --experimental-strip-types --test tests/backend.test.mjs tests/brush.test.mjs tests/layer-bundle.test.mjs tests/image-lab.test.mjs
 ```
 
 Changes to `db/schema.ts` require a generated schema migration:

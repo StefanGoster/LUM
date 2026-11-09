@@ -2,18 +2,21 @@
 
 LUM keeps composition editable: each object has its own position, size, rotation, opacity and optional mask. Clipboard import, stabilized drawing, scoped ChatGPT briefs, raster inspection and prepared-layer import work now. ChatGPT can orchestrate generative preparation through available conversation image tools. An in-editor automatic **Dissect** button, semantic selection masks and an autonomous inference service remain proposed next steps; no paid inference engine is active.
 
-## Chat command
+## Chat-first command (v2)
 
-Attach an image in a conversation with LUM connected and say **“Dissect into LUM.”** The MCP server advertises this natural-language workflow; it is not a dedicated slash command or a new image model.
+**Dissect** alone returns named image outputs in the current chat. **Dissect into LUM** adds optional progressive saving to the editor. The same independent workflow supports HD / Remaster, Clean Noise and Reimagine. A clear command skips the menu; an ambiguous creative artwork submission gets one short observation and relevant choices. Error screenshots and identification questions are not editing triggers.
 
-1. Identify the source, meaningful objects, stack order and placement.
-2. Create a new project unless the user chose an existing destination. Save the original as a locked, hidden source layer.
-3. Use the conversation's available native image tools to prepare one transparent object per output, referencing the same original for every output. No additional provider setup is necessary for this generative route.
-4. Check alpha, boundaries, dimensions and composition. Keep supplied exact lettering where possible; identify reconstructed or uncertain details in source notes.
-5. Upload the assets and import their named layers together using the latest project revision.
-6. Read back the saved project and return its link with any remaining quality limitations.
+1. Inspect the source and identify meaningful objects, stack order and placement. Keep the original unchanged.
+2. Prepare one transparent candidate with the chat's native image tool, referencing the original. Generation is separate from this backend.
+3. Show that output immediately and record its actual file reference. Continue one object at a time.
+4. Only if LUM saving was selected, use `lum_import_chat_file` with a valid platform-provided file object. No image bytes travel through textual tool output. If unavailable, preserve chat results and use ordinary file upload/paste; never fall back to large base64.
+5. Read the destination project, retain the original as a locked hidden layer, and import each object independently with a one-object bundle and the latest revision. Use stable layer IDs. On uncertainty, read before retrying and skip already saved IDs.
+6. Save compact metadata using `lum_save_image_checkpoint`; resume with `lum_get_image_checkpoint`. Distinguish planned, generated, saved and blocked. Checkpoints do not themselves store images.
+7. Verify actual saved layers before claiming LUM completion. A transfer failure never restarts generation or erases the completed chat outputs.
 
-This route is generative isolation/reconstruction. It can alter details and does not guarantee an exact recomposition of the original. If the user asks for exact pixel extraction, use suitable segmentation/masks or state the missing capability instead of silently regenerating the artwork. The workflow depends on the tools available in the conversation and their usage limits. A command alone does not execute image generation, and backend preparation tools must not be reported as completed images.
+Generative isolation/reconstruction can change details and invent hidden areas. It is not exact pixel extraction or recovery of original Photoshop layers. HD and cleanup are native image-editing directions, not an installed deterministic upscale/denoise engine. Preserve original lettering and texture, and disclose uncertainty.
+
+The reusable chat source lives in `integrations/chatgpt/image-lab`. Independent logic and the menu live in `modules/image-lab`. They share a repository with LUM without requiring its document storage for ordinary chat image work.
 
 ## Start with the source
 
