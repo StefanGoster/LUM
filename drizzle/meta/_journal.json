@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1794238502564,
+      "tag": "0000_left_dreadnoughts",
+      "breakpoints": true
+    }
+  ]
+}
