@@ -24,6 +24,16 @@ Use the native image generation/editing tool exposed in the current chat, follow
 
 Combine selected cleanup/remaster directions into an object's generation when reasonable, instead of repeatedly encoding or shuttling the same image. Keep the modules independently usable.
 
+## Default artifact check: Clean Finish
+
+Apply this quality check to every Dissect, HD, Clean Noise and Reimagine output unless the user explicitly wants the affected texture. Support “Clean Finish” or “AI pattern cleanup” as a focused Clean Noise direction, independently of LUM storage.
+
+Look for repetitive fish-scale/scalloped marks, wormlike squiggles, indiscriminate micro-hatching, crunchy edge halos, waxy smoothing, and texture that ignores the depicted material or form. These are visual symptoms, not proof that an image is AI-generated; there is no universal AI fingerprint to subtract. Distinguish intentional engraving, grain, crosshatching and distress from incoherent artifacts before changing them.
+
+Include in image-editing directions: preserve silhouette, anatomy, architecture, typography, palette and purposeful strokes; remove incoherent repeated surface pattern; simplify flat regions into clean solid colors or controlled tonal shapes; keep texture only where it supports the material and design. Avoid global blur, aggressive sharpening, fabricated fine detail and replacing one repetitive texture with another. Do not flatten intentional shading into solid fills unless requested.
+
+Keep the original and return a separate candidate. Review the actual result at whole-image and detail scale where available. Reject a “cleaned” result that is merely softer, has new geometry, damages lettering, or retains the same patterned artifacts. Describe remaining defects honestly. Do not claim designer-quality or pixel-preserving cleanup without evidence. A tiny crop can illustrate a symptom but cannot establish the original intended structure; use the full-resolution source for a final restoration. Never upscale a tiny crop and claim recovered original detail.
+
 ## Bound work and preserve progress
 
 Show each generated result immediately through the image tool's supported display mechanism. Follow platform saving rules. Record small metadata checkpoints: source reference, requested actions, planned object names, completed output references, pending items and limitations. Never invent a downloadable URL, asset ID, saved layer, or completed status. A tool returning only a brief is still pending generation.
