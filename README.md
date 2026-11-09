@@ -4,10 +4,14 @@ A private layered design studio for Stefan. The red hexagon is the identity; Cha
 
 This is an editable composition tool. Projects contain separate text, shapes, paths, images, transforms, masks and references. They are not flattened into a single generated image when saved.
 
+![LUM studio with stabilized brush controls](docs/images/studio-brushes.jpg)
+
 ## What works
 
 - Select, move, resize and rotate individual objects with Fabric.js controls.
-- Native text, rectangles, ellipses, freehand sketch paths and uploaded artwork.
+- Native text, rectangles, ellipses, editable brush paths and uploaded artwork.
+- Paste copied images with Ctrl+V / ⌘V or the Paste image button. Each image becomes its own layer, preserving supplied transparency.
+- Four stabilized brushes: Clean ink, Round marker, Chisel marker and Dry spray. Adjust size, color, stabilization, opacity, pressure variation and chisel angle.
 - Layer visibility, opacity, locks, duplication, deletion and stack order.
 - Reversible rectangular and elliptical masks.
 - Reference images with structure, style, palette, subject and source roles.
@@ -16,8 +20,12 @@ This is an editable composition tool. Projects contain separate text, shapes, pa
 - Durable projects in D1 and private uploaded assets in R2.
 - Revision checks that prevent a stale browser tab or ChatGPT edit from silently overwriting newer work.
 - MCP tools that let a connected ChatGPT inspect and edit the same saved projects.
+- Actual raster-image inspection through `lum_inspect_artwork`, and atomic import of prepared objects through `lum_import_layer_bundle`.
+- A selected-layer **Reimagine in ChatGPT** action that copies a focused brief with placement, preservation rules and a curated render direction.
 
 The editor uses Fabric.js 7.4.0. Its restrained atmosphere adapts a pinned MIT-licensed ThreeUI shader. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for source attribution and license notices.
+
+Use **Copy image**, rather than Copy image address, before pasting. Clipboard access depends on the browser; the keyboard shortcut or file import is the fallback. Pasting into a text field retains normal text-editing behavior. Real pen pressure is used when the device supplies it; mouse ink uses simulated variation based on movement. Brush strokes remain editable vector objects, not editable font characters.
 
 ## Using LUM with ChatGPT
 
@@ -29,16 +37,22 @@ Useful requests include:
 - “Move the red circle 40 pixels left. Keep the text and locked artwork unchanged.”
 - “Make the selected source image a structure reference at 80% strength.”
 - “Prepare an engraving render brief for this composition, preserving the original geometry.”
+- “Inspect the actual image in this layer and propose meaningful objects before we rebuild it.”
+- “Import these prepared transparent assets as aligned layers. Keep my original source.”
 
 The plugin reads a project's current revision before editing it. Its tools reject conflicting revisions and locked-layer edits. If you see a conflict in the editor, preserve your working copy and reload the current project before retrying.
 
 ### Generation is a separate step
 
-LUM does **not** call an image model, spend API credits or require an OpenAI API key. `lum_prepare_render` produces a structured brief; it does not generate an image. Image generation, when available in the surrounding ChatGPT session, happens separately. A generated result can then be imported as a new layer.
+LUM does **not** call an image model, spend API credits or require an OpenAI API key. **Reimagine in ChatGPT** saves the project and copies a scoped brief for you to paste into the connected conversation; it does not automatically start a ChatGPT turn. `lum_prepare_render` also produces a structured brief, not an image. Image generation, when available in the surrounding ChatGPT session, happens separately. Import the result as a separate candidate layer for review, preserving the original.
+
+For new designs, plan the objects first and prepare each as a separate transparent asset with consistent placement. Keep exact lettering as native text or supplied vector artwork. `lum_import_layer_bundle` adds up to 50 prepared layers in back-to-front order in one revision-checked operation. It rejects duplicate or existing IDs and leaves existing layers and locks intact. Assets must already be uploaded to LUM; the tool does not generate or separate them.
+
+`lum_inspect_artwork` lets ChatGPT see an uploaded PNG, JPEG or WebP image up to 8 MB. It returns the original source pixels alongside placement and mask metadata, not a screenshot of the composed canvas. SVG inspection needs a raster preview. Neither inspection nor bundle import performs automatic dissection.
 
 Reference strength is recorded guidance. It is not a guarantee that a model will preserve exact geometry. Locked objects and deterministic layers are preserved by the editor's document operations. Imported raster artwork does not automatically become separable objects.
 
-The current masks are geometric clips, not a full Photoshop selection or painting system. The interface has no live 3D scene renderer, automatic background segmentation, PSD interchange, automatic layer decomposition, or production print certification. These are future extensions, not hidden capabilities.
+The current masks are geometric clips, not a full Photoshop selection system. The interface has no live 3D scene renderer, automatic background segmentation, PSD interchange, automatic layer decomposition, or production print certification. A hosted decomposition engine remains a design choice; no new paid inference service is active. See [the layer workflow](docs/LAYER_WORKFLOW.md) for the proposed Extract/Rebuild distinction and the path from flat artwork to editable objects.
 
 ## Hosting and access
 
@@ -68,6 +82,12 @@ corepack pnpm exec tsc --noEmit
 corepack pnpm run build
 ```
 
+Run the document, brush geometry and layer-bundle checks with:
+
+```sh
+node --experimental-strip-types --test tests/backend.test.mjs tests/brush.test.mjs tests/layer-bundle.test.mjs
+```
+
 Changes to `db/schema.ts` require a generated schema migration:
 
 ```sh
@@ -88,6 +108,7 @@ Hosted migrations are applied by the Sites publication workflow. Keep migrations
 | --- | --- |
 | `components/lum/Studio.tsx` | Workspace UI, project state, undo/redo, saves and inspector |
 | `components/lum/CanvasEditor.tsx` | Fabric rendering, direct transforms, clips, sketches and export |
+| `components/lum/StabilizedBrush.ts`, `lib/brush.ts` | Pointer input, stabilization and native brush-path geometry |
 | `components/lum/Atmosphere.tsx` | Optional restrained ThreeUI-derived interface decoration |
 | `lib/types.ts` | Versioned editable project document |
 | `lib/server/validation.ts` | Input validation, revision and lock rules |

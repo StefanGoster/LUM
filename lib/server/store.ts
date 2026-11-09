@@ -1,6 +1,6 @@
 import { env } from 'cloudflare:workers';
 import type { LumDocument,ProjectSummary } from '../types';
-import { LumError,parseDocument,assertLockedLayers,assertRevision,blankDocument,validateAsset } from './validation';
+import { LumError,parseDocument,assertLockedLayers,assertRevision,blankDocument,validateAsset,artworkImageContent } from './validation';
 
 function db(){if(!env.DB)throw new LumError('Project storage is unavailable.',503,'storage_unavailable');return env.DB;}
 export async function listProjects():Promise<ProjectSummary[]>{
@@ -37,4 +37,15 @@ export async function getAsset(id:string){
   if(!env.BUCKET)throw new LumError('Asset storage is unavailable.',503,'storage_unavailable');
   const asset=await env.BUCKET.get(`assets/${id}`);if(!asset)throw new LumError('Artwork was not found.',404,'asset_not_found');
   const headers=new Headers({'Cache-Control':'private, max-age=3600','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; sandbox"});asset.writeHttpMetadata(headers);headers.set('ETag',asset.httpEtag);return new Response(asset.body,{headers});
+}
+
+/** Read only an uploaded asset already referenced by a layer in this studio. */
+export async function readArtworkForModel(src:string){
+  const match=/^\/api\/assets\/([a-zA-Z0-9_-]+)$/.exec(src);
+  if(!match)throw new LumError('Inspection requires an uploaded LUM artwork asset. Reimport this image using Upload or Paste first.',400,'inspection_requires_upload');
+  if(!env.BUCKET)throw new LumError('Asset storage is unavailable.',503,'storage_unavailable');
+  const asset=await env.BUCKET.get(`assets/${match[1]}`);
+  if(!asset)throw new LumError('Artwork was not found.',404,'asset_not_found');
+  if(asset.size>8_000_000)throw new LumError('This artwork is too large to inspect in chat. Import a raster preview smaller than 8 MB.',413,'inspection_too_large');
+  return artworkImageContent(await asset.arrayBuffer(),asset.httpMetadata?.contentType??'application/octet-stream');
 }

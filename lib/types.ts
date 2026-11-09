@@ -1,3 +1,4 @@
+import type {BrushSettings} from './brush';
 export type LayerKind = 'rect'|'ellipse'|'text'|'image'|'path';
 export type ReferenceRole = 'structure'|'style'|'palette'|'subject'|'source';
 export type LayerMask = {kind:'ellipse'|'rect'; inset:number; inverted?:boolean};
@@ -7,4 +8,4 @@ export type RecipeId='original'|'archive'|'noir'|'signal'|'sand';
 export interface LumDocument {version:1;id:string;name:string;width:number;height:number;background:string;transparent:boolean;layers:LumLayer[];references:LumReference[];recipe:RecipeId;notes:string;revision:number;updatedAt:string;}
 export interface ProjectSummary {id:string;name:string;revision:number;updatedAt:string;}
 export interface CanvasHandle {exportPng:()=>string|undefined; exportSvg:()=>string|undefined; fit:()=>void;}
-export interface CanvasProps {document:LumDocument;selectedId:string|null;onSelect:(id:string|null)=>void;onChange:(layers:LumLayer[])=>void;tool:'select'|'draw'|'mask';zoom:number;onZoom:(zoom:number)=>void;preview?:boolean;}
+export interface CanvasProps {document:LumDocument;selectedId:string|null;onSelect:(id:string|null)=>void;onChange:(layers:LumLayer[])=>void;tool:'select'|'draw'|'mask';zoom:number;onZoom:(zoom:number)=>void;preview?:boolean;brush?:BrushSettings;}

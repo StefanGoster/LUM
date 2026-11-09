@@ -99,3 +99,29 @@ export function validateAsset(bytes:ArrayBuffer,inputMime:string){
   }
   return mime;
 }
+
+/** Validate a whole proposed bundle before producing any changed document. */
+export function appendLayerBundle(current:LumDocument,input:unknown,expectedRevision:number,sourceNote?:string):LumDocument {
+  assertRevision(current,expectedRevision);
+  const parsed=z.array(layerSchema).min(1).max(50).safeParse(input);
+  if(!parsed.success)throw new LumError(parsed.error.issues.map(e=>`${e.path.join('.')}: ${e.message}`).join('; '));
+  if(sourceNote!==undefined&&(typeof sourceNote!=='string'||sourceNote.length>10000))throw new LumError('Source note must be at most 10,000 characters.');
+  const ids=new Set(current.layers.map(layer=>layer.id));
+  const layers=parsed.data.map(layer=>{
+    if(ids.has(layer.id))throw new LumError(`Layer ID ${layer.id} already exists in the project or bundle.`,409,'duplicate_layer');
+    ids.add(layer.id);
+    return {...layer,...(sourceNote&&!layer.sourceNote?{sourceNote}:{} )};
+  });
+  const next=parseDocument({...current,layers:[...current.layers,...layers]});
+  assertLockedLayers(current,next);
+  return next;
+}
+
+export function artworkImageContent(bytes:ArrayBuffer,inputMime:string){
+  if(bytes.byteLength>8_000_000)throw new LumError('This artwork is too large to inspect in chat. Import a PNG, JPEG or WebP preview smaller than 8 MB.',413,'inspection_too_large');
+  const mimeType=validateAsset(bytes,inputMime);
+  if(mimeType==='image/svg+xml')throw new LumError('SVG inspection is not supported by chat image content. Export or import a PNG preview of this layer.',415,'inspection_requires_raster');
+  const view=new Uint8Array(bytes);let binary='';
+  for(let offset=0;offset<view.length;offset+=32768)binary+=String.fromCharCode(...view.subarray(offset,offset+32768));
+  return {type:'image' as const,mimeType,data:btoa(binary)};
+}
